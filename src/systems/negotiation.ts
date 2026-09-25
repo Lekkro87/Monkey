@@ -41,6 +41,7 @@ export function startNegotiation(offer: BuyerOffer, rng: RNG): Negotiation {
 }
 
 function roundOffer(v: number): number {
+  if (v < 20) return Math.round(v);
   if (v < 100) return Math.round(v / 5) * 5;
   if (v < 1000) return Math.round(v / 10) * 10;
   return Math.round(v / 50) * 50;
@@ -133,7 +134,15 @@ export function walkAway(n: Negotiation, rng: RNG): Negotiation {
   return n;
 }
 
+/** Three rising counter-offers above the current offer, never repeating an amount. */
 export function suggestedCounters(n: Negotiation): number[] {
-  const c = n.current;
-  return [1.15, 1.3, 1.5].map((m) => roundOffer(c * m));
+  const out: number[] = [];
+  let last = n.current;
+  for (const m of [1.15, 1.3, 1.5]) {
+    let v = roundOffer(n.current * m);
+    if (v <= last) v = last + (last < 20 ? 1 : last < 100 ? 5 : last < 1000 ? 10 : 50);
+    out.push(v);
+    last = v;
+  }
+  return out;
 }

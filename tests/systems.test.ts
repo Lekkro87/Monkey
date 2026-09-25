@@ -5,7 +5,7 @@ import { itemDef } from '../src/data/items';
 import { AuctionRun } from '../src/systems/auction';
 import { Game } from '../src/systems/game';
 import { appraise, createInstance, displayName, estimateRange, marketValue, performStep, publicValue } from '../src/systems/items';
-import { counter, startNegotiation, walkAway } from '../src/systems/negotiation';
+import { counter, startNegotiation, suggestedCounters, walkAway } from '../src/systems/negotiation';
 import type { Bidder } from '../src/systems/npc';
 import { NPC_MAP } from '../src/data/npcs';
 import { MemoryBackend } from '../src/systems/save';
@@ -148,6 +148,17 @@ describe('negotiation', () => {
       if (n.outcome === 'open' && n.current > 500) better++;
     }
     expect(better).toBeGreaterThan(10);
+  });
+
+  it('suggests distinct, rising counter-offers even for cheap items', () => {
+    for (const amount of [3, 5, 12, 40, 95, 480, 2300]) {
+      const n = startNegotiation({ ...offer, offer: amount, maxPay: amount * 2 }, new RNG(1));
+      const c = suggestedCounters(n);
+      expect(c).toHaveLength(3);
+      expect(c[0]).toBeGreaterThan(n.current);
+      expect(c[1]).toBeGreaterThan(c[0]);
+      expect(c[2]).toBeGreaterThan(c[1]);
+    }
   });
 });
 
