@@ -63,7 +63,8 @@ export class SearchController implements Controller {
     if (fs.unit?.id !== unit.id) fs.focusLot(unit);
     fs.openDoor(1, 0.01);
     fs.flashlight.intensity = 22;
-    for (const [id, f] of fs.figures) if (id !== 'auctioneer' && f.root.position.z > -6) f.root.visible = false;
+    // The crowd and the auctioneer have moved on; only people already back at the cars stay visible.
+    for (const f of fs.figures.values()) if (f.root.position.z > -6) f.root.visible = false;
     app.showFacility();
     this.restoreState();
     this.physics = new PhysicsWorld(unit.dims.w, unit.dims.d, unit.dims.h);
@@ -177,7 +178,7 @@ export class SearchController implements Controller {
       h('div', { class: ['meter', 'segmented', full ? 'warn' : ''] }, h('i', { style: { width: `${Math.min(100, (used / cap) * 100)}%` } })),
       h('div', { class: 'row between' }, h('span', { class: 'label' }, t('Payload')), h('b', { class: 'num' }, `${Math.round(kg)} / ${pay} kg`)),
       h('div', { class: ['meter', kg / pay > 0.85 ? 'warn' : ''] }, h('i', { style: { width: `${Math.min(100, (kg / pay) * 100)}%` } })),
-      h('div', { class: 'grid-2', style: { marginTop: '4px' } },
+      h('div', { class: 'col', style: { marginTop: '4px', gap: '6px' } },
         h('button', { class: 'btn', disabled: v.cargo().length === 0, onClick: () => this.driveLoad() }, icon('van', 16), t('Drive load ({cost})', { cost: money(v.tripCost()) })),
         h('button', { class: 'btn primary', onClick: () => this.finish() }, icon('check', 16), t('Finish unit')),
       ),
