@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { CONFIG } from '../../core/config';
-import { decimal, money, N_, t } from '../../core/i18n';
+import { decimal, money, N_, t, tDeep } from '../../core/i18n';
 import type { ItemInstance } from '../../core/types';
 import { itemDef } from '../../data/items';
 import { COSMETICS, QUEST_MAP, UPGRADES, type CosmeticDef } from '../../data/progression';
@@ -219,7 +219,7 @@ export class GarageController implements Controller {
         const can = game.canBuyUpgrade(u.id);
         return h('button', { class: ['action-row', owned ? 'done' : ''], disabled: owned || !can.ok, onClick: () => this.buy(u.id) },
           icon(owned ? 'check' : 'bolt', 18),
-          h('div', null, h('b', null, t(u.name)), h('span', { style: { display: 'block' } }, t(u.description)), !owned && !can.ok && can.reason ? h('span', { style: { display: 'block', color: 'var(--orange)' } }, t(can.reason)) : null),
+          h('div', null, h('b', null, t(u.name)), h('span', { style: { display: 'block' } }, t(u.description)), !owned && !can.ok && can.reason ? h('span', { style: { display: 'block', color: 'var(--orange)' } }, tDeep(can.reason, can.params)) : null),
           h('span', { class: 'cost num' }, owned ? t('Owned') : money(u.cost)));
       })),
     ]));

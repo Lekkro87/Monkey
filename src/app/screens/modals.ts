@@ -1,4 +1,4 @@
-import { money, t, type Lang } from '../../core/i18n';
+import { type Lang, t, tDeep } from '../../core/i18n';
 import { FACILITIES } from '../../data/facilities';
 import { h } from '../../ui/dom';
 import { icon } from '../../ui/icons';
@@ -96,8 +96,7 @@ export function newsModal(app: App) {
       : h('div', { class: 'col', style: { gap: '6px' } }, news.map((n) =>
         h('div', { class: 'row', style: { alignItems: 'flex-start', padding: '6px 0', borderBottom: '1px solid var(--line)' } },
           icon(kindIcon[n.kind] ?? 'info', 16),
-          h('div', { class: 'grow' }, h('div', null, t(n.text, n.p ? Object.fromEntries(Object.entries(n.p).map(([k, v]) => [k, typeof v === 'string' ? t(v) : v])) : undefined)), h('span', { class: 'faint', style: { fontSize: '12px' } }, t('Day {n}', { n: n.day }))),
+          h('div', { class: 'grow' }, h('div', null, tDeep(n.text, n.p)), h('span', { class: 'faint', style: { fontSize: '12px' } }, t('Day {n}', { n: n.day }))),
         ))),
   });
-  void money;
 }

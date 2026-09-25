@@ -4,7 +4,7 @@ import type { ItemInstance, Rarity, UnitEventId } from '../core/types';
 import { CATEGORY_NAMES, RARITY_NAMES, itemDef } from '../data/items';
 import { EVENT_INFO } from '../data/units';
 import { Thumbs } from '../render/thumbnails';
-import { authenticityRead, conditionRange, displayName, estimateRange, visibleRarity } from '../systems/items';
+import { authenticityRead, conditionRange, displayName, estimateOpenEnded, estimateRange, visibleRarity } from '../systems/items';
 import type { MarketState } from '../core/types';
 import { h } from './dom';
 import { icon } from './icons';
@@ -52,7 +52,7 @@ export function conditionText(inst: ItemInstance): string {
 export function valueText(inst: ItemInstance, market: MarketState): string {
   const [lo, hi] = estimateRange(inst, market);
   if (hi <= 0) return t('Worthless');
-  return moneyRange(lo, hi);
+  return moneyRange(lo, hi) + (estimateOpenEnded(inst) ? '+' : '');
 }
 
 export function thumb(inst: ItemInstance) {

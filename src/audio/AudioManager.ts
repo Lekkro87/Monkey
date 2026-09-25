@@ -208,8 +208,7 @@ export class AudioManager {
         const chord = [60, 64, 67, 72, 76, 79];
         chord.forEach((n, i) => {
           for (const det of [-6, 6]) {
-            const o = this.osc('sawtooth', NOTE(n) * Math.pow(2, det / 1200), t + 0.15 + i * 0.05, 2.6, 0.035 * v, wet, 0.4);
-            void o;
+            this.osc('sawtooth', NOTE(n) * Math.pow(2, det / 1200), t + 0.15 + i * 0.05, 2.6, 0.035 * v, wet, 0.4);
           }
           this.osc('triangle', NOTE(n + 12), t + 0.15 + i * 0.05, 2.4, 0.04 * v, out, 0.3);
         });

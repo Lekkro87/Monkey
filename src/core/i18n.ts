@@ -43,6 +43,14 @@ export function t(src: string, params?: Record<string, string | number>): string
   return out;
 }
 
+/** t() for messages whose string parameters are English source strings as well (item names, titles). */
+export function tDeep(src: string, params?: Record<string, string | number>): string {
+  if (!params) return t(src);
+  const p: Record<string, string | number> = {};
+  for (const [k, v] of Object.entries(params)) p[k] = typeof v === 'string' ? t(v) : v;
+  return t(src, p);
+}
+
 /**
  * Marks a string for translation without translating it yet (gettext's N_).
  * Use it for labels that are stored first and passed through t() later.
@@ -83,6 +91,11 @@ export function decimal(n: number, digits = 1): string {
     maximumFractionDigits: digits,
   });
   return f.format(n);
+}
+
+/** Cubic metres; tiny items read "<0.01 m³" instead of a misleading zero. */
+export function volume(m3: number): string {
+  return m3 > 0 && m3 < 0.005 ? `<${decimal(0.01, 2)} m³` : `${decimal(m3, 2)} m³`;
 }
 
 export function moneyRange(lo: number, hi: number): string {

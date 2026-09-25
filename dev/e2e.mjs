@@ -132,17 +132,64 @@ if (first) {
   await wait(2000);
   await shot('17-market-item');
 }
+// Tabs are identified by position so the run works in every language.
+const tabs = async (prefix, from = 0) => {
+  const n = await page.locator('.tabs .tab').count();
+  for (let i = from; i < n; i++) {
+    await page.locator('.tabs .tab').nth(i).click();
+    await wait(900);
+    await shot(`${prefix}-tab${i}`);
+  }
+};
+await page.evaluate(() => window.SH.app.route('garage'));
+await wait(1500);
+await tabs('21-garage', 2);
 await page.evaluate(() => { window.SH.game.advanceDay(); window.SH.game.advanceDay(); window.SH.app.route('market'); });
 await wait(1000);
-await page.locator('.tab', { hasText: /Trends/ }).click();
-await wait(800);
-await shot('18-market-trends');
+await tabs('22-market', 1);
+// Haggle with the pawn shop on the first item.
+if (first) {
+  await page.evaluate((uid) => window.SH.app.route('market', { item: uid }), first);
+  await wait(1200);
+  const haggle = page.locator('.channel .btn:not(.primary):not([disabled])').first();
+  if (await haggle.count()) {
+    await haggle.click();
+    await wait(900);
+    await shot('23-negotiation');
+    await page.keyboard.press('Escape');
+    await wait(400);
+  }
+}
+// Negotiate with a private buyer from the offers tab.
+await page.evaluate(() => window.SH.app.route('market'));
+await wait(900);
+await page.locator('.tabs .tab').nth(1).click();
+await wait(700);
+const nego = page.locator('.panel-body .btn.primary:not([disabled])').first();
+if (await nego.count()) {
+  await nego.click();
+  await wait(900);
+  await shot('23b-offer-negotiation');
+  await page.keyboard.press('Escape');
+  await wait(400);
+}
 await page.evaluate(() => window.SH.app.route('progress'));
 await wait(1500);
-await shot('19-progress');
+await shot('24-progress');
+await tabs('24-progress', 1);
 await page.evaluate(() => window.SH.app.route('collection'));
 await wait(1500);
-await shot('20-collection');
+await shot('25-collection');
+await page.evaluate(() => window.SH.app.route('title'));
+await wait(2000);
+await shot('26-title-continue');
+await page.locator('.menu .menu-item').last().click();
+await wait(900);
+await shot('27-settings');
 console.log('ERRORS', errors.length);
 for (const e of errors.slice(0, 20)) console.log(' -', e.slice(0, 400));
+const missing = await page.evaluate(() => window.SH.missingTranslations?.() ?? []);
+const real = missing.filter((m) => /[a-z]{3}/.test(m) && !/^\$/.test(m));
+console.log('MISSING_TRANSLATIONS', real.length);
+for (const m of real.slice(0, 60)) console.log(' ~', m);
 await browser.close();

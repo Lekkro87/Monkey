@@ -228,12 +228,13 @@ export class Game {
     return this.state.garage.upgrades.includes(id) || this.state.vehicle.upgrades.includes(id);
   }
 
-  canBuyUpgrade(id: string): { ok: boolean; reason?: string } {
+  /** `reason` is an English source string for t(), filled with `params`. */
+  canBuyUpgrade(id: string): { ok: boolean; reason?: string; params?: Record<string, string | number> } {
     const u = UPGRADE_MAP[id];
     if (!u) return { ok: false, reason: 'Unknown upgrade.' };
     if (this.hasUpgrade(id)) return { ok: false, reason: 'Already owned.' };
-    if (this.level() < u.level) return { ok: false, reason: `Requires level ${u.level}.` };
-    if (u.requires && !this.hasUpgrade(u.requires)) return { ok: false, reason: `Requires ${UPGRADE_MAP[u.requires].name}.` };
+    if (this.level() < u.level) return { ok: false, reason: 'Requires level {n}.', params: { n: u.level } };
+    if (u.requires && !this.hasUpgrade(u.requires)) return { ok: false, reason: 'Requires {name}.', params: { name: UPGRADE_MAP[u.requires].name } };
     if (!this.economy.canAfford(u.cost)) return { ok: false, reason: 'Not enough money.' };
     return { ok: true };
   }

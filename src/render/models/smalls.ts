@@ -341,13 +341,12 @@ export const SMALLS: Record<string, (k: Kit) => void> = {
   },
 
   knickknacks(k) {
-    const { w, h, d, dirt, rng } = k;
+    const { w, d, dirt, rng } = k;
     k.lathe([[0, 0], [0.03, 0], [0.035, 0.05], [0.02, 0.09], [0, 0.1]], Materials.color('#c8a870', 0.4, 0, dirt), -w * 0.3, 0, 0);
     k.sphere(0.045, Materials.get({ color: '#dfefff', rough: 0.05, opacity: 0.5 }), 0, 0.075, 0, 16);
     k.cyl(0.045, 0.05, 0.03, M.wood('walnut', dirt), 0, 0.015, 0);
     const owl = k.sphere(0.035, Materials.color(rng.pick(['#8a6a4a', '#5a7a8a']), 0.5, 0, dirt), w * 0.28, 0.035, d * 0.1, 12);
     owl.scale.y = 1.4;
-    void h;
   },
 
   frames(k) {
@@ -380,15 +379,13 @@ export const SMALLS: Record<string, (k: Kit) => void> = {
   },
 
   dvds(k) {
-    const { w, h, d, rng } = k;
+    const { h, rng } = k;
     let y = 0;
     while (y < h - 0.012) {
       const c = k.box(0.135, 0.014, 0.19, Materials.color(rng.pick(['#1a1a1a', '#1f3f8a', '#8a1f2a', '#2a2a2a']), 0.35), 0, y + 0.007, 0);
       c.rotation.y = rng.range(-0.15, 0.15);
       y += 0.015;
     }
-    void w;
-    void d;
   },
 
   board_games(k) {

@@ -8,7 +8,7 @@ import { TREND_NAMES, TREND_TAGS } from '../../data/progression';
 import { BLUEPRINT_MAP } from '../../data/units';
 import { CONDITION_NAMES } from '../../core/config';
 import { accept, counter, suggestedCounters, walkAway, type Negotiation } from '../../systems/negotiation';
-import { estimateMid, roundNice } from '../../systems/items';
+import { roundNice } from '../../systems/items';
 import { avatar, itemName, profitClass, thumb, valueText } from '../../ui/common';
 import { h, replace } from '../../ui/dom';
 import { icon } from '../../ui/icons';
@@ -421,7 +421,7 @@ export class MarketController implements Controller {
       return h('button', { class: 'sell-row', style: { gridTemplateColumns: '64px 1fr auto' }, onClick: () => this.reportModal(u.id) },
         h('div', { class: 'lot-door', style: { height: '44px', fontSize: '15px' } }, u.number),
         h('div', null, h('b', null, t(BLUEPRINT_MAP[u.blueprintId].name)), h('span', null, `${t('Day {n}', { n: u.day })} · ${p.complete ? t('closed') : t('{s} of {n} items sold', { s: p.sold, n: p.total })}`)),
-        h('div', { style: { textAlign: 'right' } }, h('b', { class: ['num', profitClass(p.profit)] }, money(p.profit, { sign: true })), h('span', { class: 'num', style: { display: 'block' } }, `ROI ${pct(p.roi)}`)),
+        h('div', { style: { textAlign: 'right' } }, h('b', { class: ['num', profitClass(p.profit)] }, money(p.profit, { sign: true })), h('span', { class: 'num', style: { display: 'block' } }, p.complete ? `ROI ${pct(p.roi)}` : `ROI ≈ ${pct(p.projectedRoi)}`)),
       );
     }));
   }
@@ -447,12 +447,11 @@ export class MarketController implements Controller {
           line(N_('Sales'), p.sales),
           h('tr', { class: 'total' }, h('td', null, t('Total profit')), h('td', { class: profitClass(p.profit) }, money(p.profit, { sign: true }))),
         ),
-        h('div', { class: 'row between' }, h('span', { class: 'eyebrow' }, 'ROI'), h('span', { class: ['big-profit', profitClass(p.profit)] }, pct(p.roi))),
+        h('div', { class: 'row between' }, h('span', { class: 'eyebrow' }, p.complete ? 'ROI' : 'ROI ≈'), h('span', { class: ['big-profit', profitClass(p.complete ? p.profit : p.profit + p.unsoldEstimate)] }, pct(p.complete ? p.roi : p.projectedRoi))),
         !p.complete ? h('p', { class: 'note' }, t('{n} items still unsold, estimated at {v}.', { n: p.total - p.sold, v: money(p.unsoldEstimate) })) : null,
         h('p', { class: 'faint', style: { fontSize: '12px' } }, t('The real value inside was {v}.', { v: money(u.trueValue) })),
       ),
     });
-    void estimateMid;
   }
 
   exit() { /* nothing */ }

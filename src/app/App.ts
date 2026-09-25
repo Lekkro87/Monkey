@@ -141,11 +141,7 @@ export class App {
       this.ui.toast(t('Level {n}: {title}', { n: level, title: t(this.game.progression.levelName(level)) }), 'achievement', 5000, 'star');
       this.audio.play('levelup');
     });
-    bus.on('item:sold', ({ item, price }) => {
-      this.audio.play('cash', 0.8);
-      void item;
-      void price;
-    });
+    bus.on('item:sold', () => this.audio.play('cash', 0.8));
     bus.on('item:fake', ({ item }) => {
       this.ui.toast(t('It is a fake: {name}', { name: t(itemDef(item.defId).fakeName ?? itemDef(item.defId).name) }), 'bad', 4200, 'x');
     });

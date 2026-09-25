@@ -78,10 +78,9 @@ export class AuctionController implements Controller {
     for (const f of fs.figures.values()) f.root.visible = true;
     if (first) {
       // Everyone arrives from the parking lane.
-      [...fs.figures.entries()].forEach(([id, f], i) => {
+      [...fs.figures.values()].forEach((f, i) => {
         f.root.position.set(fs.lotX - 6 + i * 2.2 + this.rng.range(-0.5, 0.5), 0, -9.2 + this.rng.range(-0.4, 0.4));
         f.out = false;
-        void id;
       });
     }
     fs.placeCrowd(today.attendees, false);

@@ -75,7 +75,7 @@ export class HubController implements Controller {
         h('div', { class: 'row wrap' }, h('b', null, t('{size} unit', { size: unit.size.replace('x', '×') })), eventChip(unit.event)),
         h('div', { class: 'line' }, t('Tenant: {name} · {months} months unpaid', { name: unit.tenant, months: unit.monthsUnpaid })),
         unit.event ? h('div', { class: 'line faint' }, t(EVENT_INFO[unit.event].text)) : null,
-        unit.rumor ? h('div', { class: 'rumor' }, `“${t(unit.rumor)}”`) : null,
+        unit.rumor ? h('div', { class: 'rumor' }, h('q', null, t(unit.rumor))) : null,
       ),
       result,
     );

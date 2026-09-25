@@ -33,7 +33,7 @@ export const ELECTRONICS: Record<string, (k: Kit) => void> = {
   },
 
   china(k) {
-    const { w, h, d, dirt } = k;
+    const { w, d, dirt } = k;
     const porcelain = Materials.color('#f4f1ea', 0.25, 0, dirt);
     for (let i = 0; i < 5; i++) k.cyl(0.11, 0.08, 0.016, porcelain, -w * 0.22, 0.01 + i * 0.02, 0, 'y', 24);
     k.lathe([[0, 0], [0.06, 0], [0.09, 0.05], [0.1, 0.1], [0.08, 0.15], [0.03, 0.17], [0.035, 0.19], [0, 0.2]], porcelain, w * 0.2, 0, 0);
@@ -43,7 +43,6 @@ export const ELECTRONICS: Record<string, (k: Kit) => void> = {
     for (const x of [-w * 0.3, w * 0.02]) {
       k.cyl(0.04, 0.03, 0.06, porcelain, x, 0.14, -d * 0.3);
     }
-    void h;
   },
 
   vacuum(k) {

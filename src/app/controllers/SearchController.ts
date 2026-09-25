@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { RARITY_ORDER } from '../../core/config';
-import { decimal, money, moneyRange, t } from '../../core/i18n';
+import { decimal, money, moneyRange, t, volume } from '../../core/i18n';
 import type { ItemInstance, UnitData } from '../../core/types';
 import { itemDef, volumeOf } from '../../data/items';
 import { partsOf, buildItem } from '../../render/models';
@@ -158,7 +158,7 @@ export class SearchController implements Controller {
         const isCash = def.id === 'cash';
         return h('div', { class: 'haul-item', style: { borderLeftColor: isUnknown(it) ? 'var(--text-faint)' : `var(--r-${def.rarity})` } },
           thumb(it),
-          h('div', null, h('b', null, isCash ? `${t('Cash')} ${money(it.soldFor ?? 0)}` : itemName(it)), h('span', null, isCash ? t('Straight into your pocket') : `${decimal(itemWeight(it), 1)} kg · ${decimal(volumeOf(def), 2)} m³`)),
+          h('div', null, h('b', null, isCash ? `${t('Cash')} ${money(it.soldFor ?? 0)}` : itemName(it)), h('span', null, isCash ? t('Straight into your pocket') : `${decimal(itemWeight(it), 1)} kg · ${volume(volumeOf(def))}`)),
         );
       }));
   }
@@ -280,7 +280,7 @@ export class SearchController implements Controller {
       const open = game.search.isOpen(uid);
       head = h('div', { class: 'head' },
         h('b', null, g.title, (g as { marker?: string }).marker ? h('span', { style: { fontFamily: 'var(--font-hand)', fontWeight: '400', color: '#ffe2a8' } }, ` ${(g as { marker?: string }).marker}`) : null),
-        h('span', null, `${decimal(itemWeight(e.inst), 1)} kg · ${decimal(volumeOf(def), 2)} m³`),
+        h('span', null, `${decimal(itemWeight(e.inst), 1)} kg · ${volume(volumeOf(def))}`),
       );
       if (def.container && !def.container.locked && !open) {
         const label = def.container.kind === 'drawers' ? t('Search the drawers') : def.container.kind === 'box' || def.container.kind === 'tote' ? t('Open the box') : t('Open it');
@@ -374,7 +374,6 @@ export class SearchController implements Controller {
       this.app.ui.toast(t('Empty.'), 'info', 1800, 'box');
     }
     let jackpot: ItemInstance | null = null;
-    let best = -1;
     res.contents.forEach((c, i) => {
       setTimeout(() => {
         if (this.app.controller !== this) return;
@@ -388,7 +387,6 @@ export class SearchController implements Controller {
           this.jackpotMoment(c, o);
         }
         if (cdef.quest) this.app.ui.toast(t('This looks personal… Initials E.M.'), 'info', 3500, 'book');
-        void best;
       }, 180 + i * 260);
     });
     this.renderCargo();

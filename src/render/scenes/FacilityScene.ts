@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { RNG } from '../../core/rng';
 import type { NpcId, PlacedItem, Tarp, UnitData } from '../../core/types';
-import { itemDef } from '../../data/items';
 import { NPC_MAP } from '../../data/npcs';
 import type { FacilityDef } from '../../data/facilities';
 import { ROW_SLOTS, doorNumber } from '../../systems/auctionSystem';
@@ -598,7 +597,6 @@ export class FacilityScene {
     obj.userData.placed = p;
     this.unitRoot.add(obj);
     this.itemObjects.set(p.inst.uid, obj);
-    const def = itemDef(p.inst.defId);
     if (p.pos[1] - p.dims[1] / 2 < 0.02) {
       const blob = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: Tex.blob(), transparent: true, opacity: 0.6, depthWrite: false }));
       blob.rotation.x = -Math.PI / 2;
@@ -608,7 +606,6 @@ export class FacilityScene {
       this.unitRoot.add(blob);
       obj.userData.blob = blob;
     }
-    void def;
     return obj;
   }
 
@@ -816,7 +813,7 @@ export class FacilityScene {
     }
     if (this.dust) {
       const pos = this.dust.geometry.attributes.position as THREE.BufferAttribute;
-      const { w, d: depth } = this.dust.userData.bounds as { w: number; d: number };
+      const { w } = this.dust.userData.bounds as { w: number };
       for (let i = 0; i < pos.count; i++) {
         let y = pos.getY(i) + Math.sin(this.t * 0.3 + i) * 0.0006 - 0.0002;
         let x = pos.getX(i) + Math.cos(this.t * 0.2 + i * 1.3) * 0.0005;
@@ -826,7 +823,6 @@ export class FacilityScene {
         pos.setXYZ(i, x, y, pos.getZ(i));
       }
       pos.needsUpdate = true;
-      void depth;
     }
     this.rig.update(dt);
   }

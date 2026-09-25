@@ -14,6 +14,8 @@ export interface UnitPnL {
   sales: number;
   profit: number;
   roi: number;
+  /** ROI if the unsold stock sells at its current estimate. */
+  projectedRoi: number;
   sold: number;
   total: number;
   unsoldEstimate: number;
@@ -62,7 +64,7 @@ export class EconomySystem {
     const st = this.game.state;
     const p: UnitPnL = {
       purchase: 0, transport: 0, disposal: 0, cleaning: 0, repair: 0, experts: 0, fees: 0, other: 0, sales: 0,
-      profit: 0, roi: 0, sold: 0, total: 0, unsoldEstimate: 0, complete: false,
+      profit: 0, roi: 0, projectedRoi: 0, sold: 0, total: 0, unsoldEstimate: 0, complete: false,
     };
     for (const e of st.ledger) {
       if (e.unitId !== unitId) continue;
@@ -92,6 +94,7 @@ export class EconomySystem {
     p.profit = p.purchase + p.transport + p.disposal + p.cleaning + p.repair + p.experts + p.fees + p.other + p.sales;
     const invested = -(p.purchase + p.transport + p.disposal + p.cleaning + p.repair + p.experts + p.fees + Math.min(0, p.other));
     p.roi = invested > 0 ? p.profit / invested : 0;
+    p.projectedRoi = invested > 0 ? (p.profit + p.unsoldEstimate) / invested : 0;
     return p;
   }
 

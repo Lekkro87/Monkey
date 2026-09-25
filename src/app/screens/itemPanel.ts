@@ -1,8 +1,8 @@
 import { CONDITION_NAMES } from '../../core/config';
-import { money, moneyRange, t, decimal } from '../../core/i18n';
+import { decimal, money, moneyRange, t, tDeep, volume } from '../../core/i18n';
 import type { ClueNote, ItemInstance } from '../../core/types';
 import { CATEGORY_NAMES, FAMILIES, itemDef, volumeOf } from '../../data/items';
-import { authenticityRead, estimateRange } from '../../systems/items';
+import { authenticityRead, estimateOpenEnded, estimateRange } from '../../systems/items';
 import { itemWeight } from '../../systems/vehicle';
 import { conditionPips, conditionText, isUnknown, itemName, rarityChip } from '../../ui/common';
 import { h } from '../../ui/dom';
@@ -10,9 +10,7 @@ import type { App } from '../App';
 import { visibleRarity } from '../../systems/items';
 
 export function clueText(c: ClueNote): string {
-  const p: Record<string, string | number> = {};
-  for (const [k, v] of Object.entries(c.p ?? {})) p[k] = typeof v === 'string' ? t(v) : v;
-  return t(c.k, p);
+  return tDeep(c.k, c.p ?? {});
 }
 
 export function notebook(inst: ItemInstance) {
@@ -44,11 +42,11 @@ export function itemHeader(app: App, inst: ItemInstance) {
     h('h2', { class: isUnknown(inst) ? 'unknown' : '' }, itemName(inst)),
     isUnknown(inst) && def.family ? h('span', { class: 'faint', style: { fontSize: '13px' } }, t(FAMILIES[def.family].hint)) : null,
     h('div', { class: 'row wrap', style: { gap: '14px' } },
-      h('span', { class: 'price-tag' }, hi <= 0 ? t('Worthless') : moneyRange(lo, hi)),
+      h('span', { class: 'price-tag' }, hi <= 0 ? t('Worthless') : moneyRange(lo, hi) + (estimateOpenEnded(inst) ? '+' : '')),
       h('div', { class: 'col', style: { gap: '4px' } },
         h('div', { class: 'row' }, conditionPips(inst), h('span', { class: 'dim', style: { fontSize: '13px' } }, conditionText(inst))),
         h('span', { class: 'faint', style: { fontSize: '12px' } },
-          `${decimal(itemWeight(inst), 1)} kg · ${decimal(volumeOf(def), 2)} m³`,
+          `${decimal(itemWeight(inst), 1)} kg · ${volume(volumeOf(def))}`,
           inst.knowledge.workingKnown && def.brokenChance ? ` · ${inst.broken ? t('not working') : t('working')}` : '',
           inst.dirt > 0.45 ? ` · ${t('dirty')}` : ''),
       ),

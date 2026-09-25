@@ -1,7 +1,7 @@
 import { CONFIG } from '../core/config';
 import { RNG, clamp } from '../core/rng';
 import type {
-  ClueNote, Condition, ItemDef, ItemInstance, ItemKnowledge, MarketState, TrendTag,
+  ClueNote, Condition, ItemDef, ItemInstance, ItemKnowledge, MarketState, Rarity, TrendTag,
 } from '../core/types';
 import { FAMILIES, ITEMS, familyMembers, itemDef, volumeOf } from '../data/items';
 import { EXPERT_MAP } from '../data/people';
@@ -203,14 +203,16 @@ export function estimateRange(inst: ItemInstance, market?: Pick<MarketState, 'tr
   if (def.category === 'trash') return [0, Math.max(1, def.baseValue)];
   if (def.id === 'cash') { const v = marketValue(inst); return [v, v]; }
   if (def.family && k.idLevel === 0) {
+    // A glance only tells the family. Show the typical span; the rare top end stays open ("+").
     const members = familyMembers(def.family);
+    const typical = members.filter((m) => TYPICAL_RARITIES.has(m.rarity));
     let lo = Infinity;
     let hi = 0;
     for (const m of members) {
       const fake = m.fakeChance ? m.fakeValue ?? 0.05 : 1;
       lo = Math.min(lo, m.baseValue * conditionMultRaw(m, 1) * fake * (m.brokenChance ? CONFIG.value.brokenMult : 1));
-      hi = Math.max(hi, m.baseValue * (1 + m.variance) * conditionMultRaw(m, 5));
     }
+    for (const m of typical.length ? typical : members) hi = Math.max(hi, m.baseValue * (1 + m.variance) * conditionMultRaw(m, 5));
     const tm = trendMult(def, market);
     return [roundNice(lo * tm), roundNice(hi * tm)];
   }
@@ -233,6 +235,14 @@ export function estimateRange(inst: ItemInstance, market?: Pick<MarketState, 'tr
   }
   const spread = k.idLevel === 1 ? 0.35 : 0.15;
   return [roundNice(lo * (1 - spread / 2)), roundNice(hi * (1 + spread / 2))];
+}
+
+const TYPICAL_RARITIES = new Set<Rarity>(['common', 'uncommon', 'rare']);
+
+/** True when an unidentified item's family also holds rarer pieces than its shown range covers. */
+export function estimateOpenEnded(inst: ItemInstance): boolean {
+  const def = itemDef(inst.defId);
+  return !!def.family && inst.knowledge.idLevel === 0 && familyMembers(def.family).some((m) => !TYPICAL_RARITIES.has(m.rarity));
 }
 
 function conditionMultRaw(def: ItemDef, c: number): number {
