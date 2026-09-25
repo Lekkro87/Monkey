@@ -379,15 +379,20 @@ export class GarageScene {
     const r = Math.max(0.14, this.benchRadius);
     const dist = Math.max(0.5, (r / Math.sin(THREE.MathUtils.degToRad(fov / 2))) * 1.08);
     const pos = center.clone().addScaledVector(new THREE.Vector3(0.07, 0.32, -0.95).normalize(), dist);
-    const look = center.clone();
+    return [pos, center.clone(), fov];
+  }
+
+  /**
+   * The garage, market and progress screens keep a panel on the right. On wide screens,
+   * turn the shot slightly so its subject sits in the free space instead of behind the panel.
+   */
+  private leaveRoomForPanel(pos: THREE.Vector3, look: THREE.Vector3, fov: number) {
     const aspect = this.camera.aspect;
-    if (aspect > 1.2) {
-      // Looking along +z the camera's right is -x: shift the whole view so the item sits left of the panel.
-      const shift = Math.tan(THREE.MathUtils.degToRad(fov / 2)) * dist * aspect * 0.34;
-      pos.x -= shift;
-      look.x -= shift;
-    }
-    return [pos, look, fov];
+    if (aspect <= 1.2) return;
+    const forward = look.clone().sub(pos);
+    const dist = forward.length();
+    const right = forward.normalize().cross(new THREE.Vector3(0, 1, 0)).normalize();
+    look.addScaledVector(right, Math.tan(THREE.MathUtils.degToRad(fov / 2)) * dist * aspect * 0.34);
   }
 
   /** Sparkle burst on the bench item (cleaning, repair, identification). */
@@ -406,6 +411,7 @@ export class GarageScene {
       desk: [new THREE.Vector3(-0.2, 1.55, D - 2.6), new THREE.Vector3(W / 2 - 0.9, 0.95, D - 0.6), 50],
     };
     const [pos, look, fov] = poses[v];
+    this.leaveRoomForPanel(pos, look, fov);
     if (dur <= 0) this.rig.set(pos, look, fov);
     else this.rig.goTo(pos, look, dur, fov);
   }
