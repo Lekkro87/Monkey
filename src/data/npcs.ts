@@ -144,6 +144,7 @@ export const AUCTIONEER = {
     twice: ['Going twice…'],
     final: ['FINAL CALL at {amount}!'],
     sold: ['SOLD! To {winner} for {amount}!'],
+    soldPlayer: ['SOLD! To paddle 99 for {amount}!'],
     nosale: ['No bids? The unit goes back to the office. Moving on.'],
   },
 };

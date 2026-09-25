@@ -43,6 +43,14 @@ export function t(src: string, params?: Record<string, string | number>): string
   return out;
 }
 
+/**
+ * Marks a string for translation without translating it yet (gettext's N_).
+ * Use it for labels that are stored first and passed through t() later.
+ */
+export function N_(src: string): string {
+  return src;
+}
+
 export function missingTranslations(): string[] {
   return [...missing];
 }

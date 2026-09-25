@@ -22,6 +22,7 @@ export interface GenerateOpts {
   day: number;
   level: number;
   number: string;
+  slot?: number;
   uid: () => string;
   market?: Pick<MarketState, 'trends' | 'events'> | null;
   storyItem?: string | null;
@@ -267,6 +268,7 @@ export function generateUnit(opts: GenerateOpts): UnitData {
   const unit: UnitData = {
     id: unitId,
     number: opts.number,
+    slot: opts.slot ?? 6,
     facilityId: opts.facility.id,
     blueprintId: bp.id,
     event: bp.event,

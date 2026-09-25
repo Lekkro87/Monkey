@@ -8,6 +8,30 @@ import type { Game } from './game';
 import { generateUnit } from './generator';
 import { type Bidder, createBidders, dailyBudgets, openingAsk, pickAttendees } from './npc';
 
+/** Doors per facility row (the 3D scene builds the same row). */
+export const ROW_SLOTS = 13;
+
+/** Door label for a slot: full doors are "B-07", half-width doors "B-07A" / "B-07B". */
+export function doorNumber(row: string, slot: number, half: boolean, second = false): string {
+  const base = `${row}-${String(slot + 1).padStart(2, '0')}`;
+  return half ? `${base}${second ? 'B' : 'A'}` : base;
+}
+
+/** Spread n lots along the row (left to right), with a little jitter. */
+export function pickSlots(n: number, rng: RNG): number[] {
+  const first = 1;
+  const last = ROW_SLOTS - 2;
+  const picks: number[] = [];
+  for (let i = 0; i < n; i++) {
+    const base = n === 1 ? (first + last) / 2 : first + ((last - first) * i) / (n - 1);
+    let s = Math.round(base) + rng.int(-1, 1);
+    s = Math.max(first, Math.min(last, s));
+    if (picks.length && s <= picks[picks.length - 1]) s = picks[picks.length - 1] + 1;
+    picks.push(Math.min(last, s));
+  }
+  return picks;
+}
+
 /** The auction day: today's lineup, running each lot, and settling results. */
 export class AuctionSystem {
   constructor(private readonly game: Game) {}
@@ -28,31 +52,32 @@ export class AuctionSystem {
     const count = tutorial ? 3 : rng.int(CONFIG.day.lotsPerDay[0], CONFIG.day.lotsPerDay[1]);
     const pool = facility.blueprints.map((id) => BLUEPRINT_MAP[id]).filter((b) => b.minLevel <= level);
     const lots: UnitData[] = [];
-    const usedNumbers = new Set<string>();
     const usedEvents = new Set<string>();
+    const row = rng.pick(facility.rows);
+    const slots = pickSlots(count, rng);
     let storyPlaced = false;
     for (let i = 0; i < count; i++) {
       const choices = pool.filter((b) => !b.event || !usedEvents.has(b.event));
       let bp = rng.weighted(choices.map((b) => [b, b.weight] as [typeof b, number]));
       if (tutorial && i === 0) bp = BLUEPRINT_MAP.household;
       if (bp.event) usedEvents.add(bp.event);
-      let number = '';
-      do number = `${rng.pick(facility.rows)}-${String(rng.int(1, 32)).padStart(2, '0')}`; while (usedNumbers.has(number));
-      usedNumbers.add(number);
       const story = !storyPlaced ? this.game.quests.storyCandidate(rng, bp) : null;
       if (story) storyPlaced = true;
-      lots.push(generateUnit({
+      const unit = generateUnit({
         facility,
         blueprint: bp,
         seed: hashString(`${st.seed}:${day}:${i}`),
         day,
         level,
-        number,
+        number: doorNumber(row, slots[i], false),
+        slot: slots[i],
         uid: () => this.game.nextUid(),
         market: st.market,
         storyItem: story,
         tutorial: tutorial && i === 0,
-      }));
+      });
+      unit.number = doorNumber(row, slots[i], unit.dims.w <= 1.6);
+      lots.push(unit);
     }
     const attendees = pickAttendees(rng, tutorial);
     return {

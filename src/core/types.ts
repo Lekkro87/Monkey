@@ -216,6 +216,8 @@ export interface UnitHiddenStats {
 export interface UnitData {
   id: string;
   number: string;
+  /** Door position in the facility row (0-based, left to right). */
+  slot: number;
   facilityId: string;
   blueprintId: string;
   event: UnitEventId | null;

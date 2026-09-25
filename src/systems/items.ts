@@ -518,7 +518,7 @@ export function canClean(inst: ItemInstance): boolean {
 
 export function cleaningCost(inst: ItemInstance, upgrades: string[]): number {
   const def = itemDef(inst.defId);
-  const base = CONFIG.workshop.cleanBase + CONFIG.workshop.cleanPerM3 * volumeOf(def) * 10 * inst.dirt;
+  const base = CONFIG.workshop.cleanBase + CONFIG.workshop.cleanPerM3 * volumeOf(def) * inst.dirt;
   const mult = upgrades.includes('cleaning_station') ? 0.6 : 1;
   return Math.max(5, Math.round(base * mult));
 }

@@ -30,7 +30,7 @@ export const FACILITIES: FacilityDef[] = [
     rarityMult: 1,
     travelCost: 20,
     blueprints: ['household', 'bachelor', 'contractor', 'musician', 'hoarder', 'estate', 'collector', 'flood', 'mystery', 'trash'],
-    doorColor: '#d9772b',
+    doorColor: '#5a88a3',
     wallColor: '#b9b2a4',
     ambience: 'suburban',
     minLevel: 1,
