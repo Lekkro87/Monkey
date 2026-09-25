@@ -165,7 +165,7 @@ await page.evaluate(() => window.SH.app.route('market'));
 await wait(900);
 await page.locator('.tabs .tab').nth(1).click();
 await wait(700);
-const nego = page.locator('.panel-body .btn.primary:not([disabled])').first();
+const nego = page.locator('.sell-row .btn.primary:not([disabled])').first();
 if (await nego.count()) {
   await nego.click();
   await wait(900);

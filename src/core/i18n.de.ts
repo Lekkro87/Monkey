@@ -381,6 +381,7 @@ export const DE: Record<string, string> = {
   "{buyer} offers {amount}": "{buyer} bietet {amount}",
   "expires day {d}": "läuft ab an Tag {d}",
   "SwapBay · {price} · {v} views · since day {d}": "SwapBay · {price} · {v} Aufrufe · seit Tag {d}",
+  "Hollister & Crane Auctioneers": "Auktionshaus Hollister & Crane",
   "Hollister & Crane · sale on day {d}{reserve}": "Hollister & Crane · Versteigerung an Tag {d}{reserve}",
   "reserve {r}": "Mindestpreis {r}",
   "Nothing listed. List items on SwapBay or consign them to the auction house from the Sell tab.": "Nichts inseriert. Inseriere Gegenstände auf SwapBay oder liefere sie über den Reiter „Verkaufen“ beim Auktionshaus ein.",
